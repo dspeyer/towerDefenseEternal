@@ -1,0 +1,39 @@
+class Tile extends Sprite {
+    constructor(board,x,y,img) {
+        super(board, x, y, 0, 1, 0, img);
+        if (img in {plains:1, hills:1}) {
+            this.elem.addEventListener('click', this.showMenu.bind(this));
+        }
+    }
+    showMenu() {
+        let towers = ['cannon','artillery','howitzer','laser','flamethrower','pusher'];
+        this.menu = [];
+        for (let i=0; i<6; i++) {
+            let dx = -.8 * Math.cos(Math.PI*(i/3+.5));
+            let dy = -.8 * Math.sin(Math.PI*(i/3+.5));
+            let s = new Sprite(this.board, this.x+dx, this.y+dy, 10, 0.5, 0, towers[i]);
+            s.elem.className+=' button';
+            s.elem.addEventListener('click',()=>{
+                new Tower(this.board,this.x,this.y,towers[i]);
+                this.hideMenu();
+            });
+            this.menu.push(s);
+        }
+        this.cover = document.createElement('div');
+        this.cover.className='cover';
+        this.cover.addEventListener('click',this.hideMenu.bind(this));
+        this.board.elem.appendChild(this.cover);
+    }
+    hideMenu() {
+        this.board.elem.removeChild(this.cover);
+        for (let s of this.menu) {
+            s.destroy();
+        }
+    }
+}
+
+class Tower extends Sprite {
+    constructor(board,x,y,img) {
+        super(board,x,y,2,1,0,img);
+    }
+}

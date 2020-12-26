@@ -1,0 +1,16 @@
+class Board {
+    constructor(id) {
+        this.elem = document.getElementById(id);
+        let rect = this.elem.getBoundingClientRect();
+        this.width = Math.max(Math.floor(rect.width / 100), 8);
+        this.height = Math.max(Math.floor(rect.height / 100), 6);
+        this.r = Math.min(rect.width / (this.width+1), rect.height / (this.height+1));
+        this.sprites = {};
+        this.spritesByPlace = Array(this.width).fill().map(()=>Array(this.height).fill().map(()=>({})));
+        for (let x=0; x<this.width; x++) {
+            for (let y=0; y<this.height; y++) {
+                new Tile(this,x,y,'plains');
+            }
+        }
+    }
+}

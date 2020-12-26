@@ -1,0 +1,43 @@
+<html>
+    <head>
+        <title>Tower Defense Eternal</title>
+        <script src="board.js"></script>
+        <script src="sprite.js"></script>
+        <script src="tile.js"></script>
+        <script src="tower.js"></script>
+        <style>
+         .sprite {
+             position: absolute;
+             transform-origin: center;
+             background-size: contain;
+             background-repeat: no-repeat;
+             background-position: center;
+         }
+         .button {
+             background-color: #aaa;
+             border: 2px outset #aaa;
+             box-shadow: 10px 5px 0 rgb(0,0,0,0.3);
+             border-radius: 20%;
+         }
+         .cover {
+             position: absolute;
+             top: 0;
+             left: 0;
+             right: 0;
+             bottom: 0;
+         }
+         canvas {
+             width: 250px;
+             background: black;
+             border: 5px blue solid;
+         }
+        </style>
+    </head>
+    <body>
+        <div id="board" style="width:100vw;height:100vh;position:relative;"></div>
+        <script>
+          console.log('a');
+          let board = new Board('board');
+        </script>
+    </body>
+</html>

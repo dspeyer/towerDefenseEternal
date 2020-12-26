@@ -1,0 +1,41 @@
+let uid = 0;
+
+class Sprite {
+    constructor(board, x, y, z, s, theta, img) {
+        this.board = board;
+        this.x_ = x;
+        this.y_ = y;
+        this.z = z;
+        this.s = s;
+        this.theta_ = theta;
+        this.img = img;
+        this.uid = (uid++);
+        this.elem = document.createElement('div');
+        this.elem.className = 'sprite';
+        this.elem.style.backgroundImage = 'url('+'images/'+img+'.png'+')';
+        this.elem.style.zIndex = z;
+        this.board.elem.appendChild(this.elem);
+        this.redraw();
+        this.board.sprites[this.uid] = this;
+    }
+
+    get x() { return this.x_; }
+    set x(v) { this.x_=v; this.redraw(); return v;}
+    get y() { return this.y_; }
+    set y(v) { this.y_=v; this.redraw(); return v;}
+    get theta() { return this.theta_; }
+    set theta(v) { this.theta_=v; this.redraw(); return v;}
+    
+    redraw() {
+        this.elem.style.width = (this.s*this.board.r)+'px';
+        this.elem.style.height = (this.s*this.board.r)+'px';
+        this.elem.style.top = ((this.y-this.s/2+.5)*this.board.r)+'px';
+        this.elem.style.left = ((this.x-this.s/2+.5)*this.board.r)+'px';
+        this.elem.style.transform = 'rotate('+this.theta+'deg)';
+    }
+
+    destroy() {
+        this.board.elem.removeChild(this.elem);
+        delete this.board.sprites[this.uid];
+    }
+}

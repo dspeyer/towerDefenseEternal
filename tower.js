@@ -1,6 +1,6 @@
 class Tower extends Sprite {
-    constructor(board,x,y,img) {
-        super(board,x,y,ZTOWER,2,0,img);
+    constructor(x,y,img) {
+        super({x,y,z:ZTOWER,s:2,img});
         this.blocksTower = true;
         this.blocksEnemy = true;
     }

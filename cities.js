@@ -1,13 +1,13 @@
 class City extends Sprite {
-    constructor(board, x, y) {
-        super(board, x, y, ZTOWER, 2, 0, 'city');
+    constructor(x, y) {
+        super({x, y, z:ZTOWER, s:2, img:'city'});
         this.blocksTower = true;
     }
 }
 
 class EvilCity extends Sprite {
-    constructor(board, x, y) {
-        super(board, x, y, ZTOWER, 2, 0, 'evilcity');
+    constructor(x, y) {
+        super({x, y, z:ZTOWER, s:2, img:'evilcity'});
         this.blocksTower = true;
     }
 }

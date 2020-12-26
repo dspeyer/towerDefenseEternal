@@ -1,22 +1,21 @@
 let uid = 0;
 
 class Sprite {
-    constructor(board, x, y, z, s, theta, img) {
-        this.board = board;
+    constructor({x, y, z, s, theta, img}) {
         this.x_ = x;
         this.y_ = y;
         this.z = z;
         this.s = s;
-        this.theta_ = theta;
+        this.theta_ = theta || 0;
         this.img = img;
         this.uid = (uid++);
         this.elem = document.createElement('div');
         this.elem.className = 'sprite';
         this.elem.style.backgroundImage = 'url('+'images/'+img+'.png'+')';
         this.elem.style.zIndex = z;
-        this.board.elem.appendChild(this.elem);
+        board.elem.appendChild(this.elem);
         this.redraw();
-        this.board.sprites[this.uid] = this;
+        board.sprites[this.uid] = this;
         this.lsh();
     }
 
@@ -28,10 +27,10 @@ class Sprite {
     set theta(v) { this.theta_=v; this.redraw(); return v;}
     
     redraw() {
-        this.elem.style.width = (this.s*this.board.r+1)+'px';
-        this.elem.style.height = (this.s*this.board.r+1)+'px';
-        this.elem.style.top = ((this.y-this.s/2+.5)*this.board.r)+'px';
-        this.elem.style.left = ((this.x-this.s/2+.5)*this.board.r)+'px';
+        this.elem.style.width = (this.s*board.r+1)+'px';
+        this.elem.style.height = (this.s*board.r+1)+'px';
+        this.elem.style.top = ((this.y-this.s/2+.5)*board.r)+'px';
+        this.elem.style.left = ((this.x-this.s/2+.5)*board.r)+'px';
         this.elem.style.transform = 'rotate('+this.theta+'deg)';
     }
 
@@ -40,14 +39,14 @@ class Sprite {
         for (let x=Math.round(this.x-this.s/2+.001); x<=Math.round(this.x+this.s/2-.001); x++) {
             for (let y=Math.round(this.y-this.s/2+.001); y<=Math.round(this.y+this.s/2-.001); y++) {
 //                console.log({x,y});
-                if (x>=0 && y>=0 && x<this.board.width && y<this.board.height) {
+                if (x>=0 && y>=0 && x<board.width && y<board.height) {
 //                    console.log('good');
                     if (un) {
-                        delete this.board.spritesByPlace[x][y][this.uid];
+                        delete board.spritesByPlace[x][y][this.uid];
                     } else {
 //                        console.log('adding');
-                        this.board.spritesByPlace[x][y][this.uid] = this;
-//                        console.log(this.board.spritesByPlace);
+                        board.spritesByPlace[x][y][this.uid] = this;
+//                        console.log(board.spritesByPlace);
                     }
                 }
             }
@@ -58,8 +57,8 @@ class Sprite {
     unlsh() { this.lsh(true); }
     
     destroy() {
-        this.board.elem.removeChild(this.elem);
-        delete this.board.sprites[this.uid];
+        board.elem.removeChild(this.elem);
+        delete board.sprites[this.uid];
         this.unlsh();
     }
 }

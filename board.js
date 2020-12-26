@@ -1,4 +1,4 @@
-const ZLAND = 0;
+const ZTILE = 0;
 const ZTOWER = 10;
 const ZENEMY = 20;
 const ZMARKER = 30;
@@ -15,6 +15,9 @@ class Board {
         this.sprites = {};
         this.spritesByPlace = Array(this.width).fill().map(()=>Array(this.height).fill().map(()=>({})));
         this.elem.addEventListener('click', this.onClick.bind(this));
+    }
+
+    start() {
         this.ticker = setInterval(this.tickAll.bind(this), 16);
         let canvas = document.createElement('canvas');
         canvas.width = this.width;
@@ -50,14 +53,14 @@ class Board {
         for (let x=0; x<this.width; x++) {
             for (let y=0; y<this.height; y++) {
                 let v = data.data[(y*this.width+x)*4];
-                new Tile(this,x,y,tiles[Math.floor(v/(256/tiles.length))]);
+                new Tile(x,y,tiles[Math.floor(v/(256/tiles.length))]);
             }
         }
         while (true) {
             let x = Math.floor(Math.random()*this.width/3) + .5;
             let y = Math.floor(Math.random()*(this.height-1)) + .5;
             if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
-                new EvilCity(this,x,y);
+                new EvilCity(x,y);
                 break;
             }
         }
@@ -65,7 +68,7 @@ class Board {
             let x = Math.floor(Math.random()*this.width/3 + 2*this.width/3) - .5;
             let y = Math.floor(Math.random()*(this.height-1)) + .5;
             if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
-                new City(this,x,y);
+                new City(x,y);
                 break;
             }
         }
@@ -97,7 +100,7 @@ class Board {
         let overlap = this.spritesOverlapping(x,y,2);
         console.log({overlap,sbp:this.spritesByPlace});
         if (overlap.filter((x)=>(x.blocksTower)).length) return;
-        let pl = new Sprite(this, x, y, ZMARKER, 2, 0, 'placeholder');
+        let pl = new Sprite({x, y, z:ZMARKER, s:2, img:'placeholder'});
         let towers = ['cannon','artillery','howitzer','laser','flamethrower','pusher'];
         let menu = [];
         let res;
@@ -105,7 +108,7 @@ class Board {
         for (let i=0; i<6; i++) {
             let dx = -1.2 * Math.cos(Math.PI*(i/3+.5));
             let dy = -1.2 * Math.sin(Math.PI*(i/3+.5));
-            let s = new Sprite(this, x+dx, y+dy, ZBUTTON, 0.75, 0, towers[i]);
+            let s = new Sprite({x:x+dx, y:y+dy, z:ZBUTTON, s:0.75, img:towers[i]});
             s.elem.className+=' button';
             s.elem.addEventListener('click', (ev)=>{ev.stopPropagation();res(towers[i]);});
             menu.push(s);
@@ -122,7 +125,7 @@ class Board {
         }
         pl.destroy();
         if (choice) {
-            new Tower(this, x,y,choice);
+            new Tower(x,y,choice);
         }
     }
 

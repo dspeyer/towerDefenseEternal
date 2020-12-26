@@ -4,4 +4,8 @@ class Tower extends Sprite {
         this.blocksTower = true;
         this.blocksEnemy = true;
     }
+    onTick() {
+        this.theta += 1;
+        this.redraw();
+    }
 }

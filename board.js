@@ -15,7 +15,7 @@ class Board {
         this.sprites = {};
         this.spritesByPlace = Array(this.width).fill().map(()=>Array(this.height).fill().map(()=>({})));
         this.elem.addEventListener('click', this.onClick.bind(this));
-
+        this.ticker = setInterval(this.tickAll.bind(this), 16);
         let canvas = document.createElement('canvas');
         canvas.width = this.width;
         canvas.height = this.height;
@@ -51,6 +51,22 @@ class Board {
             for (let y=0; y<this.height; y++) {
                 let v = data.data[(y*this.width+x)*4];
                 new Tile(this,x,y,tiles[Math.floor(v/(256/tiles.length))]);
+            }
+        }
+        while (true) {
+            let x = Math.floor(Math.random()*this.width/3) + .5;
+            let y = Math.floor(Math.random()*(this.height-1)) + .5;
+            if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
+                new EvilCity(this,x,y);
+                break;
+            }
+        }
+        while (true) {
+            let x = Math.floor(Math.random()*this.width/3 + 2*this.width/3) - .5;
+            let y = Math.floor(Math.random()*(this.height-1)) + .5;
+            if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
+                new City(this,x,y);
+                break;
             }
         }
     }
@@ -107,6 +123,12 @@ class Board {
         pl.destroy();
         if (choice) {
             new Tower(this, x,y,choice);
+        }
+    }
+
+    tickAll() {
+        for (let uid in this.sprites) {
+            if (this.sprites[uid].onTick) this.sprites[uid].onTick();
         }
     }
 }

@@ -6,6 +6,7 @@
         <script src="tile.js"></script>
         <script src="tower.js"></script>
         <script src="cities.js"></script>
+        <script src="enemy.js"></script>
         <style>
          .sprite {
              position: absolute;
@@ -32,10 +33,32 @@
              background: black;
              border: 5px blue solid;
          }
+         .hpbar {
+             position: absolute;
+             top: 3%;
+             height: 7%;
+             left: 3%;
+             right: 3%;
+             border: 1px solid black;
+         }
+         #defeat {
+             position: absolute;
+             color: red;
+             background: rgba(0,0,0,0.5);
+             opacity: 0.8;
+             font-size: 50pt;
+             top: calc(50vh - .6em);
+             left: calc(50vw - 3em);
+             width: 6em;
+             height: 1.2em;
+             text-align: center;
+             display: none;
+         }
         </style>
     </head>
     <body>
         <div id="board" style="width:100vw;height:100vh;position:relative;"></div>
+        <div id="defeat"> Defeat </div>
         <script>
           console.log('a');
           let board = new Board('board');

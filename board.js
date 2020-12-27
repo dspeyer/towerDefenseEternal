@@ -9,12 +9,14 @@ class Board {
     constructor(id) {
         this.elem = document.getElementById(id);
         let rect = this.elem.getBoundingClientRect();
-        this.width = Math.max(Math.floor(rect.width / 40), 8);
-        this.height = Math.max(Math.floor(rect.height / 40), 6);
+        this.width = Math.max(Math.floor(rect.width / 60), 8);
+        this.height = Math.max(Math.floor(rect.height / 60), 6);
         this.r = Math.min(rect.width / (this.width+1), rect.height / (this.height+1));
         this.sprites = {};
         this.spritesByPlace = Array(this.width).fill().map(()=>Array(this.height).fill().map(()=>({})));
+        this.targetting = Array(this.width).fill().map(()=>Array(this.height).fill().map(()=>({dist:42,dir:[0,0]})));
         this.elem.addEventListener('click', this.onClick.bind(this));
+        window.addEventListener('keyup', this.showHideTargetting.bind(this));
     }
 
     start() {
@@ -48,7 +50,6 @@ class Board {
             }
         }
         let data = ctx.getImageData(0,0,this.width,this.height);
-        console.log(data);
         let tiles = ['plains','swamp','jungle','hills','mountains'];
         for (let x=0; x<this.width; x++) {
             for (let y=0; y<this.height; y++) {
@@ -60,7 +61,7 @@ class Board {
             let x = Math.floor(Math.random()*this.width/3) + .5;
             let y = Math.floor(Math.random()*(this.height-1)) + .5;
             if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
-                new EvilCity(x,y);
+                this.evilcity = new EvilCity(x,y);
                 break;
             }
         }
@@ -68,12 +69,86 @@ class Board {
             let x = Math.floor(Math.random()*this.width/3 + 2*this.width/3) - .5;
             let y = Math.floor(Math.random()*(this.height-1)) + .5;
             if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
-                new City(x,y);
+                this.city = new City(x,y);
                 break;
+            }
+        }
+        while (true) {
+            this.recalcTargetting();
+            if (this.targettingOK()) break;
+            while (true) {
+                let x = Math.floor(Math.random()*this.width);
+                let y = Math.floor(Math.random()*this.height);
+                let tiles = this.spritesOverlapping(x,y,1).filter((x)=>x.blocksEnemy);
+                if (tiles.length) {
+                    tiles.forEach((x)=>{x.destroy();});
+                    new Tile(x,y,'plains');
+                    break;
+                }
             }
         }
     }
 
+    recalcTargetting() {
+        for (let row of this.targetting) {
+            for (let cell of row) {
+                cell.dist = Infinity;
+                cell.dir = [0,0];
+            }
+        }
+        let toExpand = [];
+        for (let dx of [-.5, .5]) {
+            for (let dy of [-.5, .5]) {
+                this.targetting[this.city.x+dx][this.city.y+dy] = {dist: 0, dir:[0,0]};
+                toExpand.push([this.city.x+dx, this.city.y+dy]);
+            }
+        }
+        while (toExpand.length) {
+            let [x,y] = toExpand.shift();
+            for (let [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                let xn = x+dx;
+                let yn = y+dy;
+                if (xn<0 || yn<0 || xn>=this.width || yn>=this.height) continue;
+                if (this.targetting[xn][yn].dist <= this.targetting[x][y].dist+1) continue;
+                if (this.spritesOverlapping(xn,yn,1).filter((x)=>(x.blocksEnemy)).length) continue;
+                this.targetting[xn][yn].dist = this.targetting[x][y].dist + 1;
+                this.targetting[xn][yn].dir = [-dx,-dy];
+                toExpand.push([xn,yn]);
+            }
+        }
+    }
+
+    targettingOK() {
+        for (let uid in this.sprites) {
+            let sprite = this.sprites[uid];
+            if (sprite.img=='evilcity' || sprite.isEnemy) {
+                let targ = this.targetting[Math.round(sprite.x)][Math.round(sprite.y)];
+                if (targ.dist == Infinity) return false;
+            }
+        }
+        return true;
+    }
+
+    showHideTargetting() {
+        let arrows = Object.values(this.sprites).filter((x)=>(x.isArrow));
+        if (arrows.length) {
+            arrows.forEach((x)=>{x.destroy();});
+            return;
+        }
+        for (let x=0; x<this.width; x++) {
+            for (let y=0; y<this.height; y++) {
+                let {dist,dir} = this.targetting[x][y];
+                let [dx,dy] = dir;
+                let arrow = new Sprite({x:x, y:y, s:.3, z:ZBUTTON, img:'cannonball'});
+                arrow.isArrow = true;
+                arrow.elem.appendChild(document.createTextNode(dist<Infinity ? dist : 'inf'));
+                arrow.elem.style.color='white';
+                arrow = new Sprite({x:x+dx*.3, y:y+dy*.3, s:.15, z:ZBUTTON, img:'cannonball'});
+                arrow.isArrow = true;
+            }
+        }
+    }
+    
     spritesOverlapping(xt,yt,st) {
         let out = {};
         for (let x=Math.round(xt-st/2+.001); x<=Math.round(xt+st/2-.001); x++) {
@@ -98,7 +173,6 @@ class Board {
         if (x>this.width-1) x=this.width-1.5;
         if (y>this.height-1) y=this.height-1.5;
         let overlap = this.spritesOverlapping(x,y,2);
-        console.log({overlap,sbp:this.spritesByPlace});
         if (overlap.filter((x)=>(x.blocksTower)).length) return;
         let pl = new Sprite({x, y, z:ZMARKER, s:2, img:'placeholder'});
         let towers = ['cannon','artillery','howitzer','laser','flamethrower','pusher'];
@@ -126,12 +200,25 @@ class Board {
         pl.destroy();
         if (choice) {
             new Tower(x,y,choice);
+            this.recalcTargetting();
+            let enemies = this.spritesOverlapping(x,y,2).filter((x)=>(x.isEnemy));
+            for (let enemy of enemies) {
+                while (this.spritesOverlapping(enemy.x,enemy.y,enemy.s).filter((x)=>(x.blocksEnemy)).length) {
+                    enemy.x -= enemy.vx;
+                    enemy.y -= enemy.vy;
+                }
+            }
         }
     }
 
     tickAll() {
-        for (let uid in this.sprites) {
-            if (this.sprites[uid].onTick) this.sprites[uid].onTick();
+        try {
+            for (let uid in this.sprites) {
+                if (this.sprites[uid].onTick) this.sprites[uid].onTick();
+            }
+        } catch (e) {
+            clearInterval(this.ticker);
+            throw e;
         }
     }
 }

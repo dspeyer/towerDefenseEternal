@@ -31,7 +31,11 @@ class Sprite {
         this.elem.style.height = (this.s*board.r+1)+'px';
         this.elem.style.top = ((this.y-this.s/2+.5)*board.r)+'px';
         this.elem.style.left = ((this.x-this.s/2+.5)*board.r)+'px';
-        this.elem.style.transform = 'rotate('+this.theta+'deg)';
+        if (Math.abs(this.theta)<90) { 
+            this.elem.style.transform = 'rotate('+this.theta+'deg)';
+        } else {
+            this.elem.style.transform = 'rotate('+(this.theta)+'deg) scaleY(-1)';
+        }
     }
 
     xlsh(un) {
@@ -54,11 +58,11 @@ class Sprite {
     }
 
     lsh() { this.xlsh(false); }
-    unlsh() { this.lsh(true); }
+    unlsh() { this.xlsh(true); }
     
     destroy() {
-        board.elem.removeChild(this.elem);
-        delete board.sprites[this.uid];
         this.unlsh();
+        delete board.sprites[this.uid];
+        board.elem.removeChild(this.elem);
     }
 }

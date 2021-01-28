@@ -42,9 +42,15 @@
              border: 1px solid black;
          }
          #defeat {
-             position: absolute;
              color: red;
              background: rgba(0,0,0,0.5);
+         }
+         #victory {
+             color: #009900;
+             background: rgba(255,255,255,0.5);
+         }
+         .result {
+             position: fixed;
              opacity: 0.8;
              font-size: 50pt;
              top: calc(50vh - .6em);
@@ -53,12 +59,63 @@
              height: 1.2em;
              text-align: center;
              display: none;
+             z-index: 100;
+         }
+         body {
+             background: #afa;
+         }
+         #holder {
+             position: absolute;
+             top: 7vh;
+             width: 100vw;
+             height: 93vh;
+         }
+         #board {
+             width: 100vw;
+             height: 93vh;
+             position: relative;
+             margin: auto;
+             box-shadow: 0 0 1px 1px #7f7, 0 0 3px 3px black;
+         }
+         #toolbar {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100vw;
+             height: 6vh;
+             display: flex;
+             flex-direction: row;
+             justify-content: space-around;
+             background: grey;
+             opacity: 0.7;
+             font-size: 4vh;
+             z-index: 1000;
+         }
+         #toolbar div {
+             min-width: 2vw;
+             background: white;
+             margin: .2vh;
+             padding: .2vh;
+             border-radius: .2vh;
+         }
+         #toolbar div input {
+             height: 95%;
          }
         </style>
     </head>
     <body>
-        <div id="board" style="width:100vw;height:100vh;position:relative;"></div>
-        <div id="defeat"> Defeat </div>
+        <div id="holder">
+            <div id="board"></div>
+        </div>
+        <div id="toolbar">
+            <div id="money"></div>
+            <div>Speed:<input type="range" min=0 max=6 value="2" id="slider"></div>
+            <div id="lives"></div>
+            <div id="vcr"></div>
+            <div><input type="button" id="dirs" value="Show Arrows"></div>
+        </div>
+        <div id="defeat" class="result"> Defeat </div>
+        <div id="victory" class="result"> Victory </div>
         <script>
           console.log('a');
           let board = new Board('board');

@@ -14,7 +14,7 @@ class Sprite {
         this.elem.style.backgroundImage = 'url('+'images/'+img+'.png'+')';
         this.elem.style.zIndex = z;
         board.elem.appendChild(this.elem);
-        this.redraw();
+        this.redraw(true);
         board.sprites[this.uid] = this;
         this.lsh();
     }
@@ -26,7 +26,8 @@ class Sprite {
     get theta() { return this.theta_; }
     set theta(v) { this.theta_=v; this.redraw(); return v;}
     
-    redraw() {
+    redraw(force) {
+        if (board.disableRedraw && !force) return;
         this.elem.style.width = (this.s*board.r+1)+'px';
         this.elem.style.height = (this.s*board.r+1)+'px';
         this.elem.style.top = ((this.y-this.s/2+.5)*board.r)+'px';

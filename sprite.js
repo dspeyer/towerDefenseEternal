@@ -19,6 +19,14 @@ class Sprite {
         this.lsh();
     }
 
+    setGradient(grad) {
+        if (this.img) {
+            this.elem.style.backgroundImage = 'url('+'images/'+this.img+'.png'+'), '+grad;
+        } else {
+            this.elem.style.backgroundImage = grad;
+        }
+    }
+    
     get x() { return this.x_; }
     set x(v) { this.unlsh(); this.x_=v; this.redraw(); this.lsh(); return v;}
     get y() { return this.y_; }

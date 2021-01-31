@@ -205,27 +205,8 @@ class Board {
         if (overlap.filter((x)=>(x.blocksTower)).length) return;
         let pl = new Sprite({x, y, z:ZMARKER, s:2, img:'placeholder'});
         let towers = ['cannon','artillery','howitzer','laser','flamethrower','pusher'];
-        let menu = [];
-        let res;
-        let p = new Promise((r)=>{res=r});
-        for (let i=0; i<6; i++) {
-            let dx = -1.2 * Math.cos(Math.PI*(i/3+.5));
-            let dy = -1.2 * Math.sin(Math.PI*(i/3+.5));
-            let s = new Sprite({x:x+dx, y:y+dy, z:ZBUTTON, s:0.75, img:towers[i]});
-            s.elem.className+=' button';
-            s.elem.addEventListener('click', (ev)=>{ev.stopPropagation();res(towers[i]);});
-            menu.push(s);
-        }
-        this.cover = document.createElement('div');
-        this.cover.className='cover';
-        this.cover.style.zIndex = ZCOVER;
-        this.cover.addEventListener('click',(ev)=>{ev.stopPropagation();res();});
-        this.elem.appendChild(this.cover);
-        let choice = await p;
-        this.elem.removeChild(this.cover);
-        for (let s of menu) {
-            s.destroy();
-        }
+        towers = towers.map((x)=>({img:x, cost:towerStats[x].cost}));
+        let choice = await this.menu(pl, towers);
         pl.destroy();
         if (choice) {
             let tower = new Tower(x,y,choice);
@@ -267,7 +248,48 @@ class Board {
             this.ticker = setInterval(this.tickAll.bind(this), 32/this.tickSpeed);
         }
     }
-    
+
+    async menu(around,opts) {
+        if (this.res) this.res();
+        this.curmenu = [];
+        let p = new Promise((r)=>{this.res=r});
+        for (let i=0; i<opts.length; i++) {
+            let dx = -1.2 * Math.cos(2*Math.PI*(i/opts.length+.25));
+            let dy = -1.2 * Math.sin(2*Math.PI*(i/opts.length+.25));
+            let s = new Sprite({x:around.x+dx, y:around.y+dy, z:ZBUTTON, s:0.75, img:opts[i].img});
+            s.elem.className+=' button';
+            s.elem.addEventListener('click', (ev)=>{ev.stopPropagation();this.res(opts[i].img);});
+            s.elem.innerText = opts[i].cost;
+            this.curmenu.push(s);
+        }
+        this.onMoneyChange();
+        this.cover = document.createElement('div');
+        this.cover.className='cover';
+        this.cover.style.zIndex = ZCOVER;
+        this.cover.addEventListener('click',(ev)=>{ev.stopPropagation();this.res();});
+        this.elem.appendChild(this.cover);
+        let choice = await p;
+        this.elem.removeChild(this.cover);
+        this.curmenu.map((b)=>{b.destroy()});
+        delete this.cover;
+        delete this.curmenu;
+        delete this.res;
+        return choice;
+    }
+
+    onMoneyChange() {
+        if (this.curmenu) {
+            for (let btn of this.curmenu) {
+                if (this.money < btn.elem.innerText-0) {
+                    btn.elem.className+=' disabled';
+                } else {
+                    btn.elem.className = btn.elem.className.replace('disabled','');
+                }
+            }
+        }
+        document.getElementById('money').innerText = '$'+this.money;
+    }
+
 }
 
 function getPx(chr) {

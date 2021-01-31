@@ -20,6 +20,14 @@
              border: 2px outset #aaa;
              box-shadow: 10px 5px 0 rgb(0,0,0,0.3);
              border-radius: 20%;
+             color: black;
+             font-weight: bold;
+             font-size: smaller;
+         }
+         .button.disabled {
+             opacity: 0.7;
+             color: red;
+             box-shadow: 5px 2px 0 rgb(0,0,0,0.2);
          }
          .cover {
              position: absolute;
@@ -117,7 +125,6 @@
         <div id="defeat" class="result"> Defeat </div>
         <div id="victory" class="result"> Victory </div>
         <script>
-          console.log('a');
           let board = new Board('board');
           board.start();
         </script>

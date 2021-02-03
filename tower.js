@@ -68,6 +68,9 @@ class Tower extends Sprite {
         }
         board.money -= this.cost;
         board.onMoneyChange();
+        let hills = board.spritesOverlapping(this.x, this.y, this.s)
+                         .filter((e)=>(e.img=='hills'));
+        this.range += hills.length / 4;
         this.elem.addEventListener('click', this.onClick.bind(this));
     }
 
@@ -110,12 +113,12 @@ class Tower extends Sprite {
     }
 
     async onClick() {
-        let range = new Sprite({x:this.x, y:this.y, z:ZTOWER, s:this.range});
+        let range = new Sprite({x:this.x, y:this.y, z:ZTOWER, s:2*this.range});
         range.setGradient('radial-gradient(transparent, transparent 60%, rgba(255,255,255,0.7) 70%, transparent 70.7%)');
         let sellPrice = Math.round(this.cost/2);
         let choice = await board.menu(this, [{img:'upgrade',cost:this.cost}, {img:'sell',cost:-sellPrice}]);
         range.destroy();
-        if (choice=='upgrade' && board.money>this.cost) {
+        if (choice=='upgrade' && board.money>=this.cost) {
             board.money -= this.cost;
             board.onMoneyChange();
             console.log('foo');
@@ -123,17 +126,19 @@ class Tower extends Sprite {
             this.damage *= 1.5;
             this.range *= 1.1;
             this.reloadTime /= 1.1;
-            this.upgraded = !!this.upgraded + 1;
-            let rg = 255 - 50/this.upgraded;
-            let b = 205 / this.upgraded;
+            if (!this.upgraded) this.upgraded = 0;
+            this.upgraded += 1;
+            let rg = 255 - 50/Math.sqrt(this.upgraded);
+            let b = 205 / Math.sqrt(this.upgraded);
             let color = `rgba(${rg},${rg},${b},0.8)`;
-            let rad = 75 - 25/this.upgraded;
-            this.setGradient(`radial-gradient(circle, transparent, ${color} ${rad}%, transparent ${rad+10}%)`);
+            let rad = 61 - 25/this.upgraded;
+            this.setGradient(`radial-gradient(circle, transparent ${rad/2}%, ${color} ${rad}%, transparent ${rad+10}%)`);
         }
         if (choice=='sell') {
             board.money += sellPrice;
             board.onMoneyChange();
             this.destroy();
+            board.recalcTargetting();
         }
     }
 }

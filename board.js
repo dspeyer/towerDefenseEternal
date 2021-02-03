@@ -213,6 +213,7 @@ class Board {
             this.recalcTargetting();
             if (! this.targettingOK() || this.money<0) {
                 this.money += tower.cost;
+                this.onMoneyChange();
                 tower.destroy();
                 this.recalcTargetting();
                 return;

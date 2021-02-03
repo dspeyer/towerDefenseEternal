@@ -25,7 +25,7 @@ const towerStats = {
     },
     laser: {
         range: 4,
-        damage: 0.1,
+        damage: 4,
         reloadTime: 50,
         ammo: 'laserbolt',
         ammosize: 0.2,
@@ -63,9 +63,6 @@ class Tower extends Sprite {
             this[k] = stats[k];
         }
         this.reload = 0;
-        if (img=='laser') {
-            this.firing = 0;
-        }
         board.money -= this.cost;
         board.onMoneyChange();
         let hills = board.spritesOverlapping(this.x, this.y, this.s)
@@ -75,11 +72,6 @@ class Tower extends Sprite {
     }
 
     onTick() {
-        if (this.firing) {
-            new Ammo(this);
-            this.firing--;
-            return;
-        }
         this.reload++;
         let targets = board.spritesOverlapping(this.x, this.y, 2*this.range)
                            .filter((e)=>(e instanceof Enemy))
@@ -104,11 +96,13 @@ class Tower extends Sprite {
         this.theta = Math.atan2(bestT.y-this.y, bestT.x-this.x) * 180 / Math.PI;
         this.redraw();
         if (this.reload >= this.reloadTime) {
-            new Ammo(this);
-            this.reload = 0;
+            console.log(this.img+' firing');
             if (this.img=='laser') {
-                this.firing = 10;
+                new LaserBolt(this);
+            } else {
+                new Ammo(this);
             }
+            this.reload = 0;
         }
     }
 
@@ -155,7 +149,7 @@ class Ammo extends Sprite {
         let vy = 0.2 * Math.sin(this.theta * Math.PI / 180);
         this.x += vx;
         this.y += vy;
-        if (this.img!='laserbolt' && sq(this.start.x-this.x)+sq(this.start.y-this.y) > sq(this.range)) {
+        if (sq(this.start.x-this.x)+sq(this.start.y-this.y) > sq(this.range)) {
             this.destroy();
             return;
         }
@@ -177,6 +171,40 @@ class Ammo extends Sprite {
                 target.vx = vx;
                 target.vy = vy;
             }
+        }
+    }
+}
+
+let lbuid = 0;
+class LaserBolt {
+    constructor({x,y,theta,damage,ammo}) {
+        this.elem = document.createElement('div');
+        this.elem.className = 'laserbolt';
+        this.elem.style.position = 'absolute';
+        this.elem.style.left = (x+.5) * board.r + 'px';
+        this.elem.style.top = (y+.5) * board.r + 'px';
+        this.elem.style.height = 0.2 * board.r + 'px';
+        this.elem.style.width = (board.width+board.height) * board.r + 'px';
+        this.elem.style.transform = `rotate(${theta}deg)`;
+        this.elem.style.transformOrigin = 'center left';
+        this.elem.style.background = 'linear-gradient(to bottom, transparent, #eee 40%, #aaf 50%, #eee 60%, transparent)';
+        this.elem.style.zIndex = ZMARKER;
+        this.elem.style.opacity = 0.9;
+        this.uid = 'lb'+(lbuid++);
+        board.elem.appendChild(this.elem);
+        for (let i=0; i<=(board.width+board.height); i+=.2) {
+            let xi = x + i * Math.cos(theta*Math.PI/180);
+            let yi = y + i * Math.sin(theta*Math.PI/180);
+            let enemies = board.spritesOverlapping(xi,yi,.2).filter((x)=>(x instanceof Enemy));
+            enemies.forEach((e)=>{e.hp.hurt(damage);});
+        }
+        board.sprites[this.uid] = this;
+    }
+    onTick() {
+        this.elem.style.opacity -= 0.2;
+        if (this.elem.style.opacity < 0) {
+            delete board.sprites[this.uid];
+            board.elem.removeChild(this.elem);
         }
     }
 }

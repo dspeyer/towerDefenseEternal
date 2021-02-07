@@ -64,7 +64,7 @@ class Tower extends Sprite {
         }
         this.reload = 0;
         board.money -= this.cost;
-        let hills = board.spritesOverlapping(this.x, this.y, this.s)
+        let hills = board.spritesOverlapping(this)
                          .filter((e)=>(e.img=='hills'));
         this.range += hills.length / 4;
         this.elem.addEventListener('click', this.onClick.bind(this));
@@ -73,7 +73,7 @@ class Tower extends Sprite {
 
     onTick() {
         this.reload++;
-        let targets = board.spritesOverlapping(this.x, this.y, 2*this.range)
+        let targets = board.spritesOverlapping({x:this.x, y:this.y, s:2*this.range})
                            .filter((e)=>(e instanceof Enemy))
                            .filter((e)=>(sq(e.x-this.x)+sq(e.y-this.y)<sq(this.range)));
         if ( ! targets.length) {
@@ -157,7 +157,7 @@ class Ammo extends Sprite {
             this.destroy();
             return;
         }
-        let targets = board.spritesOverlapping(this.x,this.y,this.s).filter((x)=>(x instanceof Enemy));
+        let targets = board.spritesOverlapping(this).filter((x)=>(x instanceof Enemy));
         if (this.img=='rocket' && targets.length) {
             this.x += 2*vx;
             this.y += 2*vy;
@@ -200,7 +200,7 @@ class LaserBolt {
         for (let i=0; i<=(board.width+board.height); i+=.2) {
             let xi = x + i * Math.cos(theta*Math.PI/180);
             let yi = y + i * Math.sin(theta*Math.PI/180);
-            let enemies = board.spritesOverlapping(xi,yi,.2).filter((x)=>(x instanceof Enemy));
+            let enemies = board.spritesOverlapping({x:xi,y:yi,s:.2}).filter((x)=>(x instanceof Enemy));
             enemies.forEach((e)=>{e.hp.hurt(damage);});
         }
         board.sprites[this.uid] = this;
@@ -217,7 +217,7 @@ class LaserBolt {
 class Explosion extends Sprite {
     constructor({x,y,damage}) {
         super({x,y,s:3,z:ZAMMO,img:'explosion'});
-        let enemies = board.spritesOverlapping(x,y,3);
+        let enemies = board.spritesOverlapping({x,y,s:3});
         console.log({x,y,damage,enemies});
         enemies = enemies.filter((x)=>(x instanceof Enemy));
         console.log(enemies);

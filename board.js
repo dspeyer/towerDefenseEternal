@@ -14,6 +14,10 @@ function trueish() {
     return true;
 }
 
+function sq(x) {
+    return x*x;
+}
+
 class Board {
     constructor(id) {
         this.elem = document.getElementById(id);
@@ -79,7 +83,7 @@ class Board {
             while (trueish()) {
                 let x = Math.floor(Math.random()*this.width/3) + .5;
                 let y = Math.floor(Math.random()*(this.height-1)) + .5;
-                if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
+                if ( ! this.spritesOverlapping({x,y,s:2}).filter((x)=>(x.blocksEnemy)).length) {
                     new EvilCity(x,y);
                     this.money += 10;
                     break;
@@ -91,7 +95,7 @@ class Board {
             while (trueish()) {
                 let x = Math.floor(Math.random()*this.width/3 + 2*this.width/3) - .5;
                 let y = Math.floor(Math.random()*(this.height-1)) + .5;
-                if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
+                if ( ! this.spritesOverlapping({x,y,s:2}).filter((x)=>(x.blocksEnemy)).length) {
                     let city = new City(x,y);
                     break;
                 }
@@ -103,7 +107,7 @@ class Board {
             while (trueish()) {
                 let x = Math.floor(Math.random()*this.width);
                 let y = Math.floor(Math.random()*this.height);
-                let tiles = this.spritesOverlapping(x,y,1).filter((x)=>x.blocksEnemy);
+                let tiles = this.spritesOverlapping({x,y,s:1}).filter((x)=>x.blocksEnemy);
                 if (tiles.length) {
                     tiles.forEach((x)=>{x.destroy();});
                     new Tile(x,y,'plains');
@@ -141,7 +145,7 @@ class Board {
         }
         while (toExpand.length) {
             let [x,y] = toExpand.shift();
-            let cost = (this.spritesOverlapping(x,y,1).filter((x)=>(x.blocksEnemy)).length) ? CHEATCOST : 1;
+            let cost = (this.spritesOverlapping({x,y,s:1}).filter((x)=>(x.blocksEnemy)).length) ? CHEATCOST : 1;
             let newDist = this.targetting[x][y].dist + cost;
             for (let [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]) {
                 let xn = x+dx;
@@ -162,7 +166,7 @@ class Board {
             let sprite = this.sprites[uid];
             if (sprite.img=='evilcity' || sprite.isEnemy) {
                 let targ = this.targetting[Math.round(sprite.x)][Math.round(sprite.y)];
-                let intangible = this.spritesOverlapping(sprite.x,sprite.y,sprite.s).filter((x)=>(x.blocksEnemy)).length;
+                let intangible = this.spritesOverlapping(sprite).filter((x)=>(x.blocksEnemy)).length;
                 if (targ.dist>=CHEATCOST && ! intangible) return false;
             }
         }
@@ -170,7 +174,7 @@ class Board {
     }
 
     showPath(x,y,follow) {
-        if (this.spritesOverlapping(x,y,1).filter((x)=>(x.isArrow)).length) return;
+        if (this.spritesOverlapping({x,y,s:1}).filter((x)=>(x.isArrow)).length) return;
         let {dist,dir} = this.targetting[x][y];
         if (dist < Infinity) {
             let [dx,dy] = dir;
@@ -205,13 +209,16 @@ class Board {
         }
     }
     
-    spritesOverlapping(xt,yt,st) {
+    spritesOverlapping({x,y,s}) {
         let out = {};
-        for (let x=Math.round(xt-st/2+.001); x<=Math.round(xt+st/2-.001); x++) {
-            for (let y=Math.round(yt-st/2+.001); y<=Math.round(yt+st/2-.001); y++) {
-                if (x>=0 && y>=0 && x<this.width && y<this.height) {
-                    for (let uid in this.spritesByPlace[x][y]) {
-                        out[uid] = this.spritesByPlace[x][y][uid];
+        for (let xi=Math.round(x-s/2+.001); xi<=Math.round(x+s/2-.001); xi++) {
+            for (let yi=Math.round(y-s/2+.001); yi<=Math.round(y+s/2-.001); yi++) {
+                if (xi>=0 && yi>=0 && xi<this.width && yi<this.height) {
+                    for (let uid in this.spritesByPlace[xi][yi]) {
+                        let sprite = this.spritesByPlace[xi][yi][uid];
+                        if ( sq(sprite.x-x) + sq(sprite.y-y) < sq((sprite.s+s)/2) ) {
+                            out[uid] = sprite;
+                        }
                     }
                 }
             }
@@ -229,7 +236,7 @@ class Board {
         if (y<0) y=.5;
         if (x>this.width-1) x=this.width-1.5;
         if (y>this.height-1) y=this.height-1.5;
-        let overlap = this.spritesOverlapping(x,y,2);
+        let overlap = this.spritesOverlapping({x,y,s:2});
         if (overlap.filter((x)=>(x.blocksTower)).length) return;
         let pl = new Sprite({x, y, z:ZTOWER, s:2, img:'placeholder'});
         pl.blocksEnemy = true;

@@ -75,3 +75,5 @@ class Sprite {
         board.elem.removeChild(this.elem);
     }
 }
+
+

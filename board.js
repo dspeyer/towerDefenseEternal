@@ -6,6 +6,14 @@ const ZAMMO = 30;
 const ZCOVER = 40;
 const ZBUTTON = 50;
 
+const CHEATCOST = 1000000;
+
+let trueishCount = 0;
+function trueish() {
+    if (trueishCount++ > 200) throw "fuck";
+    return true;
+}
+
 class Board {
     constructor(id) {
         this.elem = document.getElementById(id);
@@ -41,7 +49,7 @@ class Board {
             let which = Math.floor(Math.random()*2);
             if (which==0) {
                 let chr;
-                while (true) {
+                while (trueish()) {
                     let n = Math.round(Math.random() * 0x1F6D4);
                     if (n>0x4e00 && n<0x9fff && Math.random()<0.8) continue; // De-emphasize unihan
                     chr = String.fromCodePoint(n);
@@ -68,7 +76,7 @@ class Board {
         }
         let nevil = Math.ceil(Math.random()*3);
         for (let i=0; i<nevil; i++) {
-            while (true) {
+            while (trueish()) {
                 let x = Math.floor(Math.random()*this.width/3) + .5;
                 let y = Math.floor(Math.random()*(this.height-1)) + .5;
                 if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
@@ -80,7 +88,7 @@ class Board {
         }
         let ngood = Math.ceil(Math.random()*3);
         for (let i=0; i<ngood; i++) {
-            while (true) {
+            while (trueish()) {
                 let x = Math.floor(Math.random()*this.width/3 + 2*this.width/3) - .5;
                 let y = Math.floor(Math.random()*(this.height-1)) + .5;
                 if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
@@ -89,10 +97,10 @@ class Board {
                 }
             }
         }
-        while (true) {
+        while (trueish()) {
             this.recalcTargetting();
             if (this.targettingOK()) break;
-            while (true) {
+            while (trueish()) {
                 let x = Math.floor(Math.random()*this.width);
                 let y = Math.floor(Math.random()*this.height);
                 let tiles = this.spritesOverlapping(x,y,1).filter((x)=>x.blocksEnemy);
@@ -133,14 +141,15 @@ class Board {
         }
         while (toExpand.length) {
             let [x,y] = toExpand.shift();
+            let cost = (this.spritesOverlapping(x,y,1).filter((x)=>(x.blocksEnemy)).length) ? CHEATCOST : 1;
+            let newDist = this.targetting[x][y].dist + cost;
             for (let [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1]]) {
                 let xn = x+dx;
                 let yn = y+dy;
                 if (xn<0 || yn<0 || xn>=this.width || yn>=this.height) continue;
-                if (this.targetting[xn][yn].dist <= this.targetting[x][y].dist+1) continue;
-                this.targetting[xn][yn].dist = this.targetting[x][y].dist + 1;
+                if (this.targetting[xn][yn].dist <= newDist) continue;
+                this.targetting[xn][yn].dist = newDist;
                 this.targetting[xn][yn].dir = [-dx,-dy];
-                if (this.spritesOverlapping(xn,yn,1).filter((x)=>(x.blocksEnemy)).length) continue;
                 toExpand.push([xn,yn]);
             }
         }
@@ -153,7 +162,8 @@ class Board {
             let sprite = this.sprites[uid];
             if (sprite.img=='evilcity' || sprite.isEnemy) {
                 let targ = this.targetting[Math.round(sprite.x)][Math.round(sprite.y)];
-                if (targ.dist == Infinity) return false;
+                let intangible = this.spritesOverlapping(sprite.x,sprite.y,sprite.s).filter((x)=>(x.blocksEnemy)).length;
+                if (targ.dist>=CHEATCOST && ! intangible) return false;
             }
         }
         return true;
@@ -222,6 +232,14 @@ class Board {
         let overlap = this.spritesOverlapping(x,y,2);
         if (overlap.filter((x)=>(x.blocksTower)).length) return;
         let pl = new Sprite({x, y, z:ZTOWER, s:2, img:'placeholder'});
+        pl.blocksEnemy = true;
+        this.recalcTargetting();
+        if (! this.targettingOK()) {
+            new FailMarker(pl);
+            pl.destroy();
+            this.recalcTargetting();
+            return;
+        }
         let towers = ['cannon','artillery','howitzer','laser','flamethrower','pusher'];
         towers = towers.map((x)=>({img:x, cost:towerStats[x].cost}));
         let choice = await this.menu(pl, towers);
@@ -235,14 +253,8 @@ class Board {
                 this.recalcTargetting();
                 return;
             }
-            let enemies = this.spritesOverlapping(x,y,2).filter((x)=>(x.isEnemy));
-            for (let enemy of enemies) {
-                while (this.spritesOverlapping(enemy.x,enemy.y,enemy.s).filter((x)=>(x.blocksEnemy)).length) {
-                    enemy.x -= enemy.vx;
-                    enemy.y -= enemy.vy;
-                }
-            }
         }
+        this.recalcTargetting();
         this.redrawToolbar();
     }
 
@@ -285,6 +297,7 @@ class Board {
         this.cover.style.zIndex = ZCOVER;
         this.cover.addEventListener('click',(ev)=>{ev.stopPropagation();this.res();});
         this.elem.appendChild(this.cover);
+        this.onMoneyChange();
         let choice = await p;
         this.elem.removeChild(this.cover);
         this.curmenu.map((b)=>{b.destroy()});

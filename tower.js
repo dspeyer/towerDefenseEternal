@@ -68,6 +68,7 @@ class Tower extends Sprite {
                          .filter((e)=>(e.img=='hills'));
         this.range += hills.length / 4;
         this.elem.addEventListener('click', this.onClick.bind(this));
+        this.hp = new HP(this, 10);
     }
 
     onTick() {
@@ -130,8 +131,12 @@ class Tower extends Sprite {
         if (choice=='sell') {
             board.money += sellPrice;
             this.destroy();
-            board.recalcTargetting();
         }
+    }
+
+    destroy() {
+        super.destroy();
+        board.recalcTargetting();
     }
 }
 
@@ -228,3 +233,16 @@ class Explosion extends Sprite {
     }
 }
                 
+
+class FailMarker extends Sprite {
+    constructor({x,y,s}) {
+        super({x,y,z:ZTOWER,s,img:'fail'});
+        this.elem.style.opacity = 1;
+    }
+    onTick() {
+        this.elem.style.opacity -= .2;
+        if (this.elem.style.opacity < 0) {
+            this.destroy();
+        }
+    }
+}

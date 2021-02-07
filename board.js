@@ -24,8 +24,11 @@ class Board {
         document.getElementById('dirs').addEventListener('click', this.showHideTargetting.bind(this));
     }
 
+    set money(v) { this.money_=v; this.onMoneyChange(); }
+    get money() { return this.money_; }
+    money_ = 0;
+
     start() {
-        this.money = 0;
         let canvas = document.createElement('canvas');
         canvas.width = this.width;
         canvas.height = this.height;
@@ -228,7 +231,6 @@ class Board {
             this.recalcTargetting();
             if (! this.targettingOK() || this.money<0) {
                 this.money += tower.cost;
-                this.onMoneyChange();
                 tower.destroy();
                 this.recalcTargetting();
                 return;
@@ -278,7 +280,6 @@ class Board {
             s.elem.innerText = opts[i].cost;
             this.curmenu.push(s);
         }
-        this.onMoneyChange();
         this.cover = document.createElement('div');
         this.cover.className='cover';
         this.cover.style.zIndex = ZCOVER;
@@ -292,14 +293,14 @@ class Board {
         delete this.res;
         return choice;
     }
-
+    
     onMoneyChange() {
         if (this.curmenu) {
             for (let btn of this.curmenu) {
                 if (this.money < btn.elem.innerText-0) {
                     btn.elem.className+=' disabled';
                 } else {
-                    btn.elem.className = btn.elem.className.replace('disabled','');
+                    btn.elem.className = btn.elem.className.replaceAll('disabled','');
                 }
             }
         }

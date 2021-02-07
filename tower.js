@@ -64,7 +64,6 @@ class Tower extends Sprite {
         }
         this.reload = 0;
         board.money -= this.cost;
-        board.onMoneyChange();
         let hills = board.spritesOverlapping(this.x, this.y, this.s)
                          .filter((e)=>(e.img=='hills'));
         this.range += hills.length / 4;
@@ -114,7 +113,6 @@ class Tower extends Sprite {
         range.destroy();
         if (choice=='upgrade' && board.money>=this.cost) {
             board.money -= this.cost;
-            board.onMoneyChange();
             console.log('foo');
             this.cost *= 2;
             this.damage *= 1.5;
@@ -131,7 +129,6 @@ class Tower extends Sprite {
         }
         if (choice=='sell') {
             board.money += sellPrice;
-            board.onMoneyChange();
             this.destroy();
             board.recalcTargetting();
         }

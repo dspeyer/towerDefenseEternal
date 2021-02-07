@@ -24,7 +24,7 @@ const towerStats = {
         cost: 10
     },
     laser: {
-        range: 4,
+        range: 3,
         damage: 4,
         reloadTime: 50,
         ammo: 'laserbolt',
@@ -127,6 +127,7 @@ class Tower extends Sprite {
             let color = `rgba(${rg},${rg},${b},0.8)`;
             let rad = 61 - 25/this.upgraded;
             this.setGradient(`radial-gradient(circle, transparent ${rad/2}%, ${color} ${rad}%, transparent ${rad+10}%)`);
+            this.onClick();
         }
         if (choice=='sell') {
             board.money += sellPrice;
@@ -143,6 +144,7 @@ class Ammo extends Sprite {
         this.start = {x,y};
         this.range = range;
         this.damage = damage;
+        this.elem.style.pointerEvents = 'none';
     }
     onTick() {
         let vx = 0.2 * Math.cos(this.theta * Math.PI / 180);
@@ -190,6 +192,7 @@ class LaserBolt {
         this.elem.style.background = 'linear-gradient(to bottom, transparent, #eee 40%, #aaf 50%, #eee 60%, transparent)';
         this.elem.style.zIndex = ZMARKER;
         this.elem.style.opacity = 0.9;
+        this.elem.style.pointerEvents = 'none';
         this.uid = 'lb'+(lbuid++);
         board.elem.appendChild(this.elem);
         for (let i=0; i<=(board.width+board.height); i+=.2) {
@@ -218,6 +221,7 @@ class Explosion extends Sprite {
         console.log(enemies);
         enemies.forEach((e)=>{e.hp.hurt(damage);});
         this.elem.style.opacity=1;
+        this.elem.style.pointerEvents = 'none';
     }
     onTick(){
         this.elem.style.opacity -= 0.2;

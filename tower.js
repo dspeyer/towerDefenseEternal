@@ -187,8 +187,8 @@ class Ammo extends Sprite {
                 return;
             }
             if (this.img == 'wind') {
-                target.vx = vx;
-                target.vy = vy;
+                target.vx = vx / 2;
+                target.vy = vy / 2;
             }
         }
     }

@@ -68,18 +68,18 @@ class Tower extends Sprite {
                          .filter((e)=>(e.img=='hills'));
         this.range += hills.length / 4;
         this.elem.addEventListener('click', this.onClick.bind(this));
-        this.hp = new HP(this, 10);
+        this.hp = new HP(this, 100);
     }
 
-    onTick() {
-        this.reload++;
+    pickTarget() {
+        if (board.target && sq(board.target.x-this.x)+sq(board.target.y-this.y)<sq(this.range)) {
+            return board.target;
+        }
         let targets = board.spritesOverlapping({x:this.x, y:this.y, s:2*this.range})
                            .filter((e)=>(e instanceof Enemy))
                            .filter((e)=>(sq(e.x-this.x)+sq(e.y-this.y)<sq(this.range)));
         if ( ! targets.length) {
-            this.theta += 1;
-            this.redraw();
-            return;
+            return null;
         }
         let bestT = targets[0], bestV=Infinity;
         for (let target of targets) {
@@ -93,7 +93,18 @@ class Tower extends Sprite {
                 if ( ! (e instanceof TypeError) ) throw e;
             }
         }
-        this.theta = Math.atan2(bestT.y-this.y, bestT.x-this.x) * 180 / Math.PI;
+        return bestT;
+    }
+
+    onTick() {
+        this.reload++;
+        let target = this.pickTarget();
+        if ( ! target) {
+            this.theta += 1;
+            this.redraw();
+            return;
+        }
+        this.theta = Math.atan2(target.y-this.y, target.x-this.x) * 180 / Math.PI;
         this.redraw();
         if (this.reload >= this.reloadTime) {
             console.log(this.img+' firing');
@@ -146,6 +157,7 @@ class Ammo extends Sprite {
         this.start = {x,y};
         this.range = range;
         this.damage = damage;
+        this.simple = ammo in {cannonball:1, shells:1};
         this.elem.style.pointerEvents = 'none';
     }
     onTick() {
@@ -157,7 +169,7 @@ class Ammo extends Sprite {
             this.destroy();
             return;
         }
-        let targets = board.spritesOverlapping(this).filter((x)=>(x instanceof Enemy));
+        let targets = board.spritesOverlapping(this).filter((x)=>(x instanceof Enemy || x==board.target));
         if (this.img=='rocket' && targets.length) {
             this.x += 2*vx;
             this.y += 2*vy;
@@ -166,8 +178,11 @@ class Ammo extends Sprite {
             return;
         }
         for (let target of targets) {
+            if (target instanceof Tile && ! this.simple) {
+                continue;
+            }
             target.hp.hurt(this.damage);
-            if (this.img in {cannonball:1, shells:1}) {
+            if (this.simple) {
                 this.destroy();
                 return;
             }

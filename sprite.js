@@ -73,6 +73,26 @@ class Sprite {
         this.unlsh();
         delete board.sprites[this.uid];
         board.elem.removeChild(this.elem);
+        if (board.target==this) {
+            board.target=null;
+        }
+    }
+
+    targettable() {
+        this.elem.addEventListener('click', (ev) => {
+            if (board.target) board.target.elem.innerText='';
+            if (board.target==this) {
+                board.target = null;
+                return;
+            }
+            board.target = this;
+            this.elem.innerText = "\uD83D\uDC51";
+        });
+        this.elem.style.textAlign='center';
+        this.elem.style.fontWeight='bold';
+        this.elem.style.color='red';
+        this.elem.style.textShadow='0 0 1px white';
+        this.elem.style.fontSize=(board.r/3)+'px';
     }
 }
 

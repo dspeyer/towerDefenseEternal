@@ -1,7 +1,8 @@
 const ZTILE = 0;
+const ZARROW = 5;
 const ZTOWER = 10;
 const ZENEMY = 20;
-const ZMARKER = 30;
+const ZAMMO = 30;
 const ZCOVER = 40;
 const ZBUTTON = 50;
 
@@ -69,6 +70,7 @@ class Board {
                 let y = Math.floor(Math.random()*(this.height-1)) + .5;
                 if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
                     new EvilCity(x,y);
+                    this.money += 10;
                     break;
                 }
             }
@@ -80,7 +82,6 @@ class Board {
                 let y = Math.floor(Math.random()*(this.height-1)) + .5;
                 if ( ! this.spritesOverlapping(x,y,2).filter((x)=>(x.blocksEnemy)).length) {
                     let city = new City(x,y);
-                    this.money += 10;
                     break;
                 }
             }
@@ -140,10 +141,8 @@ class Board {
                 toExpand.push([xn,yn]);
             }
         }
-        if (Object.values(this.sprites).filter((x)=>(x.isArrow)).length) {
-            this.showHideTargetting();
-            this.showHideTargetting();
-        }
+        this.showHideTargetting();
+        this.showHideTargetting();
     }
 
     targettingOK() {
@@ -157,22 +156,38 @@ class Board {
         return true;
     }
 
+    showPath(x,y,follow) {
+        if (this.spritesOverlapping(x,y,1).filter((x)=>(x.isArrow)).length) return;
+        let {dist,dir} = this.targetting[x][y];
+        if (dist < Infinity) {
+            let [dx,dy] = dir;
+            let arrow = new Sprite({x:x, y:y, s:1, z:ZARROW, img:'arrow', theta:Math.atan2(dy,dx)*180/Math.PI});
+            arrow.isArrow = true;
+            arrow.elem.style.opacity = (follow ? 0.4 : 0.8);
+            if (follow) {
+                this.showPath(x+dx, y+dy, follow);
+            }
+        }
+    }
+    
     showHideTargetting() {
         let arrows = Object.values(this.sprites).filter((x)=>(x.isArrow));
-        if (arrows.length) {
-            arrows.forEach((x)=>{x.destroy();});
+        arrows.forEach((x)=>{x.destroy();});
+        if (document.getElementById('dirs').value=='Hide Arrows') {
             document.getElementById('dirs').value='Show Arrows';
+            let evil = Object.values(this.sprites).filter((x)=>(x instanceof EvilCity));
+            for (let ev of evil) {
+                this.showPath(ev.x-.5, ev.y-.5, true);
+                this.showPath(ev.x+.5, ev.y-.5, true);
+                this.showPath(ev.x-.5, ev.y+.5, true);
+                this.showPath(ev.x+.5, ev.y+.5, true);
+            }
             return;
         }
         document.getElementById('dirs').value='Hide Arrows';
         for (let x=0; x<this.width; x++) {
             for (let y=0; y<this.height; y++) {
-                let {dist,dir} = this.targetting[x][y];
-                if (dist < Infinity) {
-                    let [dx,dy] = dir;
-                    let arrow = new Sprite({x:x, y:y, s:1, z:ZMARKER, img:'arrow', theta:Math.atan2(dy,dx)*180/Math.PI});
-                    arrow.isArrow = true;
-                }
+                this.showPath(x,y);
             }
         }
     }
@@ -203,7 +218,7 @@ class Board {
         if (y>this.height-1) y=this.height-1.5;
         let overlap = this.spritesOverlapping(x,y,2);
         if (overlap.filter((x)=>(x.blocksTower)).length) return;
-        let pl = new Sprite({x, y, z:ZMARKER, s:2, img:'placeholder'});
+        let pl = new Sprite({x, y, z:ZTOWER, s:2, img:'placeholder'});
         let towers = ['cannon','artillery','howitzer','laser','flamethrower','pusher'];
         towers = towers.map((x)=>({img:x, cost:towerStats[x].cost}));
         let choice = await this.menu(pl, towers);

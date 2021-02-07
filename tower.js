@@ -140,7 +140,7 @@ class Tower extends Sprite {
 
 class Ammo extends Sprite {
     constructor({x,y,ammo,ammosize,theta,range,damage}) {
-        super({x,y,theta,s:ammosize,z:ZMARKER,img:ammo});
+        super({x,y,theta,s:ammosize,z:ZAMMO,img:ammo});
         this.start = {x,y};
         this.range = range;
         this.damage = damage;
@@ -190,7 +190,7 @@ class LaserBolt {
         this.elem.style.transform = `rotate(${theta}deg)`;
         this.elem.style.transformOrigin = 'center left';
         this.elem.style.background = 'linear-gradient(to bottom, transparent, #eee 40%, #aaf 50%, #eee 60%, transparent)';
-        this.elem.style.zIndex = ZMARKER;
+        this.elem.style.zIndex = ZAMMO;
         this.elem.style.opacity = 0.9;
         this.elem.style.pointerEvents = 'none';
         this.uid = 'lb'+(lbuid++);
@@ -214,7 +214,7 @@ class LaserBolt {
 
 class Explosion extends Sprite {
     constructor({x,y,damage}) {
-        super({x,y,s:3,z:ZMARKER,img:'explosion'});
+        super({x,y,s:3,z:ZAMMO,img:'explosion'});
         let enemies = board.spritesOverlapping(x,y,3);
         console.log({x,y,damage,enemies});
         enemies = enemies.filter((x)=>(x instanceof Enemy));

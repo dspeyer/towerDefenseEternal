@@ -115,6 +115,8 @@ class Board {
                 }
             }
         }
+        this.totcr = 0;
+        this.finalcr = Math.round(Math.pow(Object.values(this.sprites).filter((x)=>(x.img=='plains')).length,1.3)/2);
         this.redrawToolbar();
         this.setTickRate();
     }
@@ -271,6 +273,14 @@ class Board {
             this.disableRedraw = (this.tickCount % this.tickSpeed != 0);
             for (let uid in this.sprites) {
                 if (this.sprites[uid].onTick) this.sprites[uid].onTick();
+            }
+            document.getElementById('perc').innerText = board.totcr+'/'+board.finalcr; // Math.floor(100*board.totcr/board.finalcr)+'%';
+            if (board.totcr >= board.finalcr) {
+                let ec = Object.values(board.sprites).filter((x)=>(x instanceof Enemy)).length;
+                if (ec==0) {
+                    document.getElementById('victory').style.display = 'block';
+                    clearInterval(this.ticker);
+                }
             }
         } catch (e) {
             clearInterval(this.ticker);

@@ -1,8 +1,8 @@
 const towerStats = {
     cannon: {
         range: 6,
-        damage: 40,
-        reloadTime: 20,
+        damage: 80,
+        reloadTime: 40,
         ammo: 'cannonball',
         ammosize: 0.2,
         cost: 5
@@ -17,7 +17,7 @@ const towerStats = {
     },
     howitzer: {
         range: 4,
-        damage: 10,
+        damage: 20,
         reloadTime: 25,
         ammo: 'rocket',
         ammosize: 0.5,
@@ -25,7 +25,7 @@ const towerStats = {
     },
     laser: {
         range: 3,
-        damage: 4,
+        damage: 25,
         reloadTime: 50,
         ammo: 'laserbolt',
         ammosize: 0.2,
@@ -33,7 +33,7 @@ const towerStats = {
     },
     flamethrower: {
         range: 3,
-        damage: 0.2,
+        damage: 0.4,
         reloadTime: 3,
         ammo: 'flame',
         ammosize: 0.5,
@@ -41,7 +41,7 @@ const towerStats = {
     },
     pusher: {
         range: 4,
-        damage: 0.1,
+        damage: 1,
         reloadTime: 50,
         ammo: 'wind',
         ammosize: 1,

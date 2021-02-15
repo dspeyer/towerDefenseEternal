@@ -64,9 +64,8 @@ class Tower extends Sprite {
         }
         this.reload = 0;
         board.money -= this.cost;
-        let hills = board.spritesOverlapping(this)
-                         .filter((e)=>(e.img=='hills'));
-        this.range += hills.length / 4;
+        let nhills = board.spritesOverlapping(this, (e)=>(e.img=='hills'));
+        this.range += nhills / 4;
         this.elem.addEventListener('click', this.onClick.bind(this));
         this.hp = new HP(this, 100);
     }
@@ -75,7 +74,7 @@ class Tower extends Sprite {
         if (board.target && sq(board.target.x-this.x)+sq(board.target.y-this.y)<sq(this.range)) {
             return board.target;
         }
-        let targets = board.spritesOverlapping({x:this.x, y:this.y, s:2*this.range})
+        let targets = Object.values(board.sprites) // board.spritesOverlapping({x:this.x, y:this.y, s:2*this.range})
                            .filter((e)=>(e instanceof Enemy))
                            .filter((e)=>(sq(e.x-this.x)+sq(e.y-this.y)<sq(this.range)));
         if ( ! targets.length) {

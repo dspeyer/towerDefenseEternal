@@ -36,7 +36,7 @@ class Enemy extends Sprite {
             }
         }
         let maxSpeed = this.maxSpeed;
-        if (board.spritesOverlapping(this).filter((x)=>(x.img=='swamp')).length) {
+        if (board.spritesOverlapping(this,(x)=>(x.img=='swamp'))) {
             maxSpeed /= 2;
         }
         if (dx==0) dx = maxSpeed * (Math.random()-0.5) / 5;
@@ -50,7 +50,7 @@ class Enemy extends Sprite {
         }
         let nx = this.x + this.vx;
         let ny = this.y + this.vy;
-        let tangible = board.spritesOverlapping(this).filter((x)=>(x.blocksEnemy)).length == 0;
+        let tangible = board.spritesOverlapping(this,(x)=>(x.blocksEnemy)) == 0;
         let xblockers=[], yblockers=[];
         if (nx<0 || nx>board.width-1) {
             this.vx = 0;

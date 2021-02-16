@@ -30,7 +30,7 @@ class EvilCity extends Sprite {
         if (board.totcr >= board.finalcr) return;
         this.vcr += this.vvcr;
         this.cr += this.vcr;
-        let enemyCount = Object.values(board.sprites).filter((x)=>(x instanceof Enemy)).length;
+        let enemyCount = Object.values(board.enemies).length;
         if (this.cr>=this.nextEnemy.cr && enemyCount<30) {
             this.spawnEnemy(this.nextEnemy);
             if (Math.random()<.3) {

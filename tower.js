@@ -74,9 +74,9 @@ class Tower extends Sprite {
         if (board.target && sq(board.target.x-this.x)+sq(board.target.y-this.y)<sq(this.range)) {
             return board.target;
         }
-        let targets = Object.values(board.sprites) // board.spritesOverlapping({x:this.x, y:this.y, s:2*this.range})
-                           .filter((e)=>(e instanceof Enemy))
-                           .filter((e)=>(sq(e.x-this.x)+sq(e.y-this.y)<sq(this.range)));
+        let targets = Object.values(board.enemies) // board.spritesOverlapping({x:this.x, y:this.y, s:2*this.range})
+                            //.filter((e)=>(e instanceof Enemy))
+                            .filter((e)=>(sq(e.x-this.x)+sq(e.y-this.y)<sq(this.range)));
         if ( ! targets.length) {
             return null;
         }

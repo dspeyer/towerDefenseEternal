@@ -18,6 +18,7 @@ class Enemy extends Sprite {
         this.accel = (this.speed==2) ? 0.002 : 0.001;
         this.isEnemy = true;
         this.targettable();
+        board.enemies[this.uid] = this;
     }
 
     onTick() {
@@ -86,6 +87,7 @@ class Enemy extends Sprite {
 
     destroy() {
         board.money += this.cr;
+        delete board.enemies[this.uid];
         super.destroy();
     }
 }

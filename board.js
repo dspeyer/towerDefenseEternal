@@ -32,6 +32,7 @@ class Board {
         this.elem.style.width = this.width * this.r + 'px';
         this.elem.style.height = this.height * this.r + 'px';
         this.sprites = {};
+        this.enemies = {};
         this.spritesByPlace = Array(this.width).fill().map(()=>Array(this.height).fill().map(()=>({})));
         this.targetting = Array(this.width).fill().map(()=>Array(this.height).fill().map(()=>({dist:42,dir:[0,0]})));
         this.tickCount = 0;
@@ -298,7 +299,7 @@ class Board {
             }
             document.getElementById('perc').innerText = board.totcr+'/'+board.finalcr; // Math.floor(100*board.totcr/board.finalcr)+'%';
             if (board.totcr >= board.finalcr) {
-                let ec = Object.values(board.sprites).filter((x)=>(x instanceof Enemy)).length;
+                let ec = Object.values(board.enemies).length;
                 if (ec==0) {
                     document.getElementById('victory').style.display = 'block';
                     clearInterval(this.ticker);

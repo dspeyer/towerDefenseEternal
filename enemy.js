@@ -11,7 +11,14 @@ class Enemy extends Sprite {
         for (let k in opts) {
             this[k] = opts[k];
         }
-        this.hp = new HP(this, this.big ? 1200 : 400);
+        let hp = this.big ? 1200 : 400;
+        //let mult = Math.pow(2,board.totcr/80);
+        let mult = 1+Math.pow(board.totcr/100, 1.5);
+        document.getElementById('enemyHpMult').innerText=mult.toFixed(2)+'x';
+        hp *= mult;
+        hp = Math.ceil(hp);
+        this.hp = new HP(this, hp);
+        this.cr += Math.floor(mult);
         this.vx = 0;
         this.vy = 0;
         this.maxSpeed = (this.speed>0) ? 0.02 : 0.01;

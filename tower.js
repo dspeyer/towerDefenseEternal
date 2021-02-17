@@ -56,7 +56,7 @@ function sq(x) {
 const POLICIES = {
     'first': (target)=>(-board.targetting[Math.round(target.x)][Math.round(target.y)].dist),
     'biggest': (target)=>(target.hp.current),
-    'clumpiest': (target)=>(target.clumpiness),
+    'clump': (target)=>(target.clumpiness),
     'last': (target)=>(board.targetting[Math.round(target.x)][Math.round(target.y)].dist)
 };
     
@@ -90,7 +90,7 @@ class Tower extends Sprite {
         if ( ! targets.length) {
             return null;
         }
-        if (this.policy=='clumpiest' && lastClumpTick<board.tickCount) {
+        if (this.policy=='clump' && lastClumpTick<board.tickCount) {
             for (let i of targets) {
                 i.clumpiness = 0;
                 for (let j of targets) {
@@ -140,9 +140,9 @@ class Tower extends Sprite {
         let range = new Sprite({x:this.x, y:this.y, z:ZTOWER, s:2*this.range});
         range.setGradient('radial-gradient(transparent, transparent 60%, rgba(255,255,255,0.7) 70%, transparent 70.7%)');
         let sellPrice = Math.round(this.cost/2);
-        let choice = await board.menu(this, [{img:'upgrade',cost:this.cost},
-                                             {img:'sell',cost:-sellPrice},
-                                             {img:this.policy,cost:''}]);
+        let choice = await board.menu(this, [{img:'upgrade', cost:this.cost},
+                                             {img:'sell', cost:-sellPrice},
+                                             {img:this.policy, cost:this.policy}]);
         range.destroy();
         if (choice=='upgrade' && board.money>=this.cost) {
             board.money -= this.cost;

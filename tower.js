@@ -53,6 +53,15 @@ function sq(x) {
     return x*x;
 }
 
+const POLICIES = {
+    'first': (target)=>(-board.targetting[Math.round(target.x)][Math.round(target.y)].dist),
+    'biggest': (target)=>(target.hp.current),
+    'clumpiest': (target)=>(target.clumpiness),
+    'last': (target)=>(board.targetting[Math.round(target.x)][Math.round(target.y)].dist)
+};
+    
+let lastClumpTick = -1;
+
 class Tower extends Sprite {
     constructor(x,y,img) {
         super({x,y,z:ZTOWER,s:2,img});
@@ -68,6 +77,7 @@ class Tower extends Sprite {
         this.range += nhills / 4;
         this.elem.addEventListener('click', this.onClick.bind(this));
         this.hp = new HP(this, 100);
+        this.policy = 'first';
     }
 
     pickTarget() {
@@ -80,12 +90,22 @@ class Tower extends Sprite {
         if ( ! targets.length) {
             return null;
         }
-        let bestT = targets[0], bestV=Infinity;
+        if (this.policy=='clumpiest' && lastClumpTick<board.tickCount) {
+            for (let i of targets) {
+                i.clumpiness = 0;
+                for (let j of targets) {
+                    let d = Math.max(Math.sqrt(sq(i.x-j.x)+sq(i.y-j.y)), 0.1);
+                    i.clumpiness += 1/d;
+                }
+            }
+            lastClumpTick = board.tickCount;
+        }
+        let bestT = targets[0], bestV=-Infinity;
         for (let target of targets) {
             try {
-                let dist = board.targetting[Math.round(target.x)][Math.round(target.y)].dist;
-                if (dist < bestV) {
-                    bestV = dist;
+                let score = POLICIES[this.policy](target);
+                if (score > bestV) {
+                    bestV = score;
                     bestT = target;
                 }
             } catch (e) {
@@ -120,7 +140,9 @@ class Tower extends Sprite {
         let range = new Sprite({x:this.x, y:this.y, z:ZTOWER, s:2*this.range});
         range.setGradient('radial-gradient(transparent, transparent 60%, rgba(255,255,255,0.7) 70%, transparent 70.7%)');
         let sellPrice = Math.round(this.cost/2);
-        let choice = await board.menu(this, [{img:'upgrade',cost:this.cost}, {img:'sell',cost:-sellPrice}]);
+        let choice = await board.menu(this, [{img:'upgrade',cost:this.cost},
+                                             {img:'sell',cost:-sellPrice},
+                                             {img:this.policy,cost:''}]);
         range.destroy();
         if (choice=='upgrade' && board.money>=this.cost) {
             board.money -= this.cost;
@@ -141,6 +163,12 @@ class Tower extends Sprite {
         if (choice=='sell') {
             board.money += sellPrice;
             this.destroy();
+        }
+        if (choice==this.policy) {
+            let pnames = Object.keys(POLICIES);
+            let cur = pnames.indexOf(this.policy);
+            this.policy = pnames[(cur+1)%pnames.length];
+            this.onClick();
         }
     }
 

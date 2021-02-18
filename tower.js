@@ -280,11 +280,13 @@ class FailMarker extends Sprite {
     constructor({x,y,s}) {
         super({x,y,z:ZTOWER,s,img:'fail'});
         this.elem.style.opacity = 1;
+        this.fade();
     }
-    onTick() {
-        this.elem.style.opacity -= .2;
-        if (this.elem.style.opacity < 0) {
-            this.destroy();
+    async fade() {
+        while (this.elem.style.opacity > 0) {
+            this.elem.style.opacity -= .1;
+            await new Promise((res)=>{setTimeout(res,75);});
         }
+        this.destroy();
     }
 }

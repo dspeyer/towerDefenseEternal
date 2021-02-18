@@ -91,9 +91,9 @@ class Tower extends Sprite {
             return null;
         }
         if (this.policy=='clump' && lastClumpTick<board.tickCount) {
-            for (let i of targets) {
+            for (let i of Object.values(board.enemies)) {
                 i.clumpiness = 0;
-                for (let j of targets) {
+                for (let j of Object.values(board.enemies)) {
                     let d = Math.max(Math.sqrt(sq(i.x-j.x)+sq(i.y-j.y)), 0.1);
                     i.clumpiness += 1/d;
                 }

@@ -1,5 +1,13 @@
 let uid = 0;
 
+function url(img) {
+    if (window.imageData && window.imageData[img]) {
+        return 'url(data:image/png;base64,'+window.imageData[img]+')';
+    } else {
+        return 'url('+'images/'+img+'.png)';
+    }
+}
+
 class Sprite {
     constructor({x, y, z, s, theta, img}) {
         this.x_ = x;
@@ -11,7 +19,7 @@ class Sprite {
         this.uid = (uid++);
         this.elem = document.createElement('div');
         this.elem.className = 'sprite';
-        this.elem.style.backgroundImage = 'url('+'images/'+img+'.png'+')';
+        this.elem.style.backgroundImage = url(img);
         this.elem.style.zIndex = z;
         board.elem.appendChild(this.elem);
         this.redraw(true);
@@ -21,7 +29,7 @@ class Sprite {
 
     setGradient(grad) {
         if (this.img) {
-            this.elem.style.backgroundImage = 'url('+'images/'+this.img+'.png'+'), '+grad;
+            this.elem.style.backgroundImage = url(this.img) + ', ' + grad;
         } else {
             this.elem.style.backgroundImage = grad;
         }

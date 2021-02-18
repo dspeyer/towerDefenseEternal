@@ -126,7 +126,6 @@ class Tower extends Sprite {
         this.theta = Math.atan2(target.y-this.y, target.x-this.x) * 180 / Math.PI;
         this.redraw();
         if (this.reload >= this.reloadTime) {
-            console.log(this.img+' firing');
             if (this.img=='laser') {
                 new LaserBolt(this);
             } else {

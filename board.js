@@ -253,6 +253,7 @@ class Board {
     }
 
     async onClick(ev) {
+        if (this.res) return;
         let box = this.elem.getBoundingClientRect();
         let xr = ((ev.clientX-box.left) / this.r)
         let yr = ((ev.clientY-box.top) / this.r)

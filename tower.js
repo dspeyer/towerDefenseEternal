@@ -78,6 +78,7 @@ class Tower extends Sprite {
         this.elem.addEventListener('click', this.onClick.bind(this));
         this.hp = new HP(this, 100);
         this.policy = 'first';
+        this.elem.style.opacity = 0.5;
     }
 
     pickTarget() {
@@ -116,6 +117,18 @@ class Tower extends Sprite {
     }
 
     onTick() {
+        if (this.elem.style.opacity < 1) {
+            if (this.dying) {
+                this.elem.style.opacity -= 0.02;
+                if (this.elem.style.opacity < 0.25) {
+                    this.destroy();
+                }
+            } else {
+                this.elem.style.opacity -= -0.02;
+                console.log('new opacity ',this.elem.style.opacity);
+            }
+            return;
+        }
         this.reload++;
         let target = this.pickTarget();
         if ( ! target) {
@@ -157,11 +170,13 @@ class Tower extends Sprite {
             let color = `rgba(${rg},${rg},${b},0.8)`;
             let rad = 61 - 25/this.upgraded;
             this.setGradient(`radial-gradient(circle, transparent ${rad/2}%, ${color} ${rad}%, transparent ${rad+10}%)`);
+            this.elem.style.opacity = 0.5;
             this.onClick();
         }
         if (choice=='sell') {
+            this.elem.style.opacity = 0.75;
+            this.dying = true;
             board.money += sellPrice;
-            this.destroy();
         }
         if (choice==this.policy) {
             let pnames = Object.keys(POLICIES);

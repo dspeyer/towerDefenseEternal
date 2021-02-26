@@ -21,7 +21,7 @@ class Enemy extends Sprite {
         this.cr += Math.floor(mult);
         this.vx = 0;
         this.vy = 0;
-        this.maxSpeed = (this.speed>0) ? 0.02 : 0.01;
+        this.maxSpeed = ([0.01, 0.03, 0.02])[this.speed];
         this.accel = (this.speed==2) ? 0.002 : 0.001;
         this.isEnemy = true;
         this.targettable();

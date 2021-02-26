@@ -5,7 +5,8 @@ const towerStats = {
         reloadTime: 40,
         ammo: 'cannonball',
         ammosize: 0.2,
-        cost: 5
+        cost: 5,
+        desc: 'Maximum DPS, but slow to fire'
     },
     artillery: {
         range: 4,
@@ -13,7 +14,8 @@ const towerStats = {
         reloadTime: 4,
         ammo: 'shells',
         ammosize: 0.2,
-        cost: 5
+        cost: 5,
+        desc: 'Basic damage-dealer'
     },
     howitzer: {
         range: 4,
@@ -21,7 +23,8 @@ const towerStats = {
         reloadTime: 25,
         ammo: 'rocket',
         ammosize: 0.5,
-        cost: 10
+        cost: 10,
+        desc: 'Fires rockets will explode on target, damaging all nearby enemies'
     },
     laser: {
         range: 3,
@@ -29,7 +32,8 @@ const towerStats = {
         reloadTime: 50,
         ammo: 'laserbolt',
         ammosize: 0.2,
-        cost: 15
+        cost: 15,
+        desc: 'Can only aim at enemies within range, but overpenetrates straight to the edge of the world'
     },
     flamethrower: {
         range: 3,
@@ -37,7 +41,8 @@ const towerStats = {
         reloadTime: 3,
         ammo: 'flame',
         ammosize: 0.5,
-        cost: 15
+        cost: 15,
+        desc: 'Short range, but damages all enemies the flame covers'
     },
     pusher: {
         range: 4,
@@ -45,7 +50,8 @@ const towerStats = {
         reloadTime: 50,
         ammo: 'wind',
         ammosize: 1,
-        cost: 10
+        cost: 10,
+        desc: 'Does minimal damage, but shoves targets back a short distance'
     }
 }
 

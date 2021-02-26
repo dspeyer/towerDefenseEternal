@@ -9,6 +9,7 @@
         <script src="tower.js"></script>
         <script src="cities.js"></script>
         <script src="enemy.js"></script>
+        <script src="help.js"></script>
         <style>
          .sprite {
              position: absolute;
@@ -113,6 +114,42 @@
          #toolbar div input {
              height: 95%;
          }
+         .help {
+             position: absolute;
+             z-index: 2000;
+             top: 12vh;
+             bottom: 12vh;
+             left: 20vw;
+             right: 20vw;
+             background: #ffd;
+             display: flex;
+             flex-direction: column;
+             padding: 1em;
+         }
+         .help > div {
+             height: calc( 100% - 2em );
+         }
+         .help > div > div {
+             overflow-y: scroll;
+             height: 100%;
+         }
+         .help > div > input{
+             width: 100%;
+             margin-top: 1em;
+         }
+         li {
+             text-transform: capitalize;
+         }
+         .helpimg {
+             width: 2em;
+             height: 2em;
+             display: inline-block;
+             background-size: contain;
+             background-repeat: no-repeat;
+             background-origin: content-box;
+             background-position: center;
+             vertical-align: middle;
+         }
         </style>
     </head>
     <body>
@@ -127,11 +164,13 @@
             <div id="enemyHpMult"></div>
             <div id="info"></div>
             <div><input type="button" id="dirs" value="Show Arrows"></div>
+            <div><input type="button" id="help" value="Help"></div>
         </div>
         <div id="defeat" class="result"> Defeat </div>
         <div id="victory" class="result"> Victory </div>
         <script>
-          let board = new Board('board');
+         document.getElementById('help').addEventListener('click', showHelp);
+         let board = new Board('board');
           board.start();
         </script>
     </body>

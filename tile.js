@@ -8,6 +8,8 @@ class Tile extends Sprite {
         if (img=='jungle') this.targettable();
     }
     destroy() {
+        if (this.destroyed) return;
+        this.destroyed = true;
         super.destroy();
         new Tile(this.x, this.y, 'plains');
         board.recalcTargetting();

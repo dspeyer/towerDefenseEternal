@@ -55,7 +55,7 @@ class Board {
         ctx.fillStyle = 'rgba(255, 255, 255, 255)';
         ctx.fillRect(0,0,this.width,this.height);
         let undrawable = getPx('\uFFFF');
-        let nfeatures = Math.round(Math.random()*3)+3;
+        let nfeatures = Math.round(Math.random()*2)+2;
         document.getElementById('info').innerText = '';
         for (let i=0; i<nfeatures; i++) {
             let which = Math.floor(Math.random()*3);
@@ -86,10 +86,17 @@ class Board {
         }
         let data = ctx.getImageData(0,0,this.width,this.height);
         document.body.removeChild(canvas);
+        let mincolor = 255;
+        for (let i=0; i<data.data.length; i+=4) {
+            if (data.data[i]<mincolor) {
+                mincolor = data.data[i];
+            }
+        }
+        let adj = 255/(255-mincolor);
         let tiles = ['plains','swamp','jungle','hills','mountains'];
         for (let x=0; x<this.width; x++) {
             for (let y=0; y<this.height; y++) {
-                let v = 255-data.data[(y*this.width+x)*4];
+                let v = (255-data.data[(y*this.width+x)*4]) * adj;
                 new Tile(x,y,tiles[Math.floor(v/(256/tiles.length))]);
             }
         }

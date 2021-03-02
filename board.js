@@ -241,7 +241,7 @@ class Board {
                 if (xi>=0 && yi>=0 && xi<this.width && yi<this.height) {
                     for (let uid in this.spritesByPlace[xi][yi]) {
                         let sprite = this.spritesByPlace[xi][yi][uid];
-                        if ( sq(sprite.x-x) + sq(sprite.y-y) < sq((sprite.s+s)/2) ) {
+                        if ( Math.max(sprite.x-x,sprite.y-y) < (sprite.s+s)/2 ) {
                             if (cb) {
                                 if (cb(sprite)) cnt++;
                             } else {

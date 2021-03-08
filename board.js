@@ -148,6 +148,7 @@ class Board {
         let cities = Object.values(this.sprites).filter((x)=>(x instanceof City));
         let hp = cities.map((c)=>(c.hp.current));
         let lives = hp.reduce((a,b)=>(a+b));
+        if ( ! this.initLives) this.initLives = lives;
         document.getElementById('lives').innerText = lives+' lives';
     }
     
@@ -305,11 +306,16 @@ class Board {
             for (let uid in this.sprites) {
                 if (this.sprites[uid].onTick) this.sprites[uid].onTick();
             }
-            document.getElementById('perc').innerText = board.totcr+'/'+board.finalcr; // Math.floor(100*board.totcr/board.finalcr)+'%';
+            document.getElementById('perc').innerText = Math.min(board.totcr,board.finalcr)+'/'+board.finalcr;
             if (board.totcr >= board.finalcr) {
                 let ec = Object.values(board.enemies).length;
                 if (ec==0) {
                     document.getElementById('victory').style.display = 'block';
+                    let lives = Object.values(this.sprites).filter((x)=>(x instanceof City)).map((c)=>(c.hp.current)).reduce((a,b)=>(a+b));
+                    if (lives == this.initLives) {
+                        document.getElementById('victory').innerText = 'Flawless Victory';
+                        document.getElementById('victory').className += ' flawless';
+                    }
                     clearInterval(this.ticker);
                 }
             }

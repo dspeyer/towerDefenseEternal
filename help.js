@@ -9,10 +9,14 @@ function bar(v,m) {
 }
 
 function tower([n,{range, damage, reloadTime, desc}]) {
-return `
+    let dmg = damage / reloadTime;
+    if (n=='flamethrower') {
+        dmg = damage * 2;
+    }
+    return `
 <tr>
   <td style="white-space:nowrap">${wimg(n)}</td>
-  <td>${bar(damage/reloadTime,2)}</td>
+  <td>${bar(dmg,2)}</td>
   <td>${bar(range,6)}</td>
   <td>${desc}</td>
 </tr>
@@ -31,6 +35,10 @@ const help = `
     start with a little).  Enemies cannot go through towers, but you
     must leave a path they can use (if you somehow manage to deny them
     a path, they will gain the ability to burrow through obstacles).
+    <h4>Board Size</h4>
+    If you grow/shrink your font (ctrl +/- or ctrl scrollwheel on most
+    browsers) you will change the square size.  Hit refresh for a new
+    board using that size squares to fill the screen.
     <h4>Towers</h4>
     <table>
       <tr>Tower<th><th>DPS</th><th>Range</th><th>Notes</th></tr>

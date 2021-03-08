@@ -10,7 +10,7 @@ const towerStats = {
     },
     artillery: {
         range: 4,
-        damage: 3,
+        damage: 4,
         reloadTime: 4,
         ammo: 'shells',
         ammosize: 0.2,

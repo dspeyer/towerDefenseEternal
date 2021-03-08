@@ -98,6 +98,8 @@ const help = `
       <li>Control arrows to show how enemies will move
       <li>Display this help
     </ul>
+    <h4>Source</h4>
+    Source is <a href="https://github.com/dspeyer/towerDefenseEternal">available on github</a>
   </div>
   <input type=button value="Close" id="closehelp">
 </div>

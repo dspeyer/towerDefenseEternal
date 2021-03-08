@@ -73,7 +73,7 @@ class Board {
                     if (getPx(chr).data.toString() != undrawable.data.toString()) break;
                 }
                 document.getElementById('info').innerText += chr;
-                ctx.fillStyle = 'rgba('+Math.floor(Math.random()*128)+', 0, 0, '+Math.floor(Math.random()*127)+128+')';
+                ctx.fillStyle = 'rgba('+Math.floor(Math.random()*64)+', 0, 0, '+Math.floor(Math.random()*64)+192+')';
                 ctx.fillText(chr,Math.floor(Math.random()*(this.width-this.height-2))+1,this.height-4);
             }
             if (which==2) {
